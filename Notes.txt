@@ -110,5 +110,3 @@
     1: A UEV is not generated and shadow registers keep their value (ARR, PSC, CCRi). The counter
     and the prescaler are re-initialized if the UG bit is set or if a hardware reset is received from the
     clock/trigger mode controller.
-
-     Редактирован в SmartGit

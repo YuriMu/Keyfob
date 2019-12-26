@@ -1,1 +1,0 @@
-1. Нужно ли тактирование GPIO? для Timer Compare output ?
