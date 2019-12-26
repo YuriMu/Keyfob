@@ -1,0 +1,35 @@
+# Log files
+*.log
+
+# IAR backup files
+Backup*
+
+# Trash files
+*.bak
+
+/**/IAR/settings/*
+/**/IAR/*.*
+!/**/IAR/*.eww
+!/**/IAR/*.ewp
+
+/**/IAR/Debug/Exe/*.*
+!/**/IAR/Debug/Exe/*.bin
+!/**/IAR/Debug/Exe/*.hex
+/**/IAR/Debug/List/*
+/**/IAR/Debug/Obj/*
+
+/**/IAR/Release/Exe/*.*
+!/**/IAR/Release/Exe/*.bin
+!/**/IAR/Release/Exe/*.hex
+/**/IAR/Release/List/*
+/**/IAR/Release/Obj/*
+
+
+
+# End of https://www.gitignore.io/api/iarembeddedworkbench
+
+# Cpp compiler IDE file
+#*.pdb
+
+# IAR settings
+#*.dnx

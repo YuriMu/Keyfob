@@ -1,0 +1,114 @@
+//1. Slope for SPI = 10 MHz.
+
+2. NRESET pin can be configured as output only.
+
+3. Switch off the BOOTROM clock after the Bootloader execution.  PCKEN27 bit in CLK_PCKENRx.
+
+4. If the FHWU bit in CLC_ICKCR is set, HSI/8 is the system clock, otherwise the system
+   clock is the last selected clock source before entering Halt mode. So FHWU must be reset.
+   
+5. In Active Halt mode LSI or  the LSE crystal is running to drive the SWIM, beeper, IWDG, RTC and
+   LCD if enabled. 
+   
+6. Iintref adds 1.4 uA, stabilization time 3 ms. V=1.202-1.224-1.242 V+-5% +-0.5% temp stability
+
+7. In PWR_CSR2 ULP, FWU bits should be set before entering Halt mode:
+   PWR_FastWakeUpCmd(ENABLE) - wake up before Iintref stabilization. Analog features will be available in ~3ms
+   PWR_UltraLowPowerCmd(ENABLE) -switchs off Iintref in Halt/ActiveHalt modes 
+   
+8. SAHALT bit in CLK_ICKCR set after reset. Leave it unchanged. Switchs off MVR in ActiveHalt mode. 
+    CLK_HaltConfig(CLK_Halt_SlowWakeup, ENABLE)- no need,as set as default after reset
+
+8. Wakeup time from Halt/ActiveHalt modes  5..7 us at 2.4 mA
+
+9. Periferial consumption at 16 MHz:
+    SPI - 48  uA
+    TIM2  128 uA
+    TIM3  128 uA    
+    ADC1  1500uA
+    PVD+BOR 2.6 uA
+    IWDG+LSI 0.45uA
+    HSI   140 uA  5-7 uS
+    LSI            200 uS  26.. 38..56 kHz +11-12% 0-85 grad temp dridt
+    
+10. Порядок создания проекта:
+    - Отредактировать stm8l15x.h и положить эту копию в рабочий каталог. Оригинальный можно не удалять, если
+      включить отредактированный в проект или в путях поиска рабочий каталог должен предшествовать оригинаьному 
+      каталогу.
+        Редактировать нужно:
+            - закомментировать типы uint8_t... и добавить #include <stdint.h>
+            - раскоментировать #define STM8L15X_LD  или нужную.
+    - Скопировать старый .eww и .ewp в новый каталог проекта исправить их имена
+    - отредактировать в опциях препроцессора проекта пути поиска на новые варианты
+    - заменить нужные или лучше все файлы .с в пректе на их новые варианты из новых каталогов
+    - в дочернем и родительском каталоге могут находиться одинаковые файлы. В порядке путей поиска
+      дочерний каталог должен искаться первым, чтобы задействовался более спецефический дочерний файл
+
+11. Инициализация для Low power режима после сброса
+    - Изменить HSI/8 = 2МГц  на HSI = 16 МГц
+    - Switch off the BOOTROM clock after the Bootloader execution.  PCKEN27 bit in CLK_PCKENRx.
+    - Только при входе в Halt(not Active Halt) дополнительно: 
+        - Выключать IntRef (потребляет всего 1.4 uA):
+            PWR_FastWakeUpCmd(ENABLE) - wake up before Iintref stabilization. Analog features will be available in ~3ms
+            PWR_UltraLowPowerCmd(ENABLE) -switchs off Iintref in Halt/ActiveHalt modes 
+       - Остановить рабочий тактовый сигнал на RTC. Т.е остановить LSI для всей системы?;
+         The LSI RC can be switched on and off using the LSION bit in the internal clock register
+         (CLK_ICKCR).
+         To detect a sequence of entry into SWIM mode, the LSI is automatically kept enabled in all
+            modes except Halt and Active-halt modes. Consequently, the LSI can be switched off by
+            clearing the LSION bit only if no peripheral is clocked by the LSI and after SWIM has been
+            disabled by setting the SWD bit in the CFG_GCR register. The LSI is not kept ON by the
+            SWIM in Halt and Active-halt mode.
+            The LSIRDY flag in the Internal clock register (CLK_ICKCR) indicates if the low-speed
+            internal oscillator is stable or not. At startup, the clock is not released until this bit is set by
+            hardware.
+    - Сбраывать флаги ждущих прерываний перд входом в Halt не надо - пусть отработают штатно сами. 
+      Если Halt стоит внутри цикла, то на более поздних итерациях все равно войдем в Halt. А если прерывания
+      запрещены?
+    - Переключать SYSCLK c HSI на LSI перед входом в Halt нет смысла, т.к. разнообразные пробуждающие
+      прерывания будут потом выполняться медленно. Если подкючен SWIM, то HSI(или LSI) при входе в Halt не отключится.
+      Однако при установке флага  FHWU bit in the Internal clock register (CLK_ICKCR) после пробуждения
+      автомаически выбирается HSI/8.
+    - Запретить  “IWDG_HALT” option bit, иначе LSI не отключится   
+    
+12. Инициализация
+    -  Slope for SPI = 10 MHz устанавливается аппаратно! CR2 bit должен как ни странно быть =0!, и push-pull
+    
+13. TIM2 TIM3 можно тактировать независимо от SYSCLK от LSE(32768 кГц). А от LSI нельзя(:    
+
+14. The TIM1_CCRi registers can be programmed with or without preload registers using the
+    OCiPE bits in the TIM1_CCMRi registers
+    
+    Bit 3 OC1PE: Output compare 1 preload enable. =0 after reset
+    0: Preload register on TIM1_CCR1 disabled. TIM1_CCR1 can be written at anytime. The new value
+    is taken into account immediately.
+    1: Preload register on TIM1_CCR1 enabled. Read/write operations access the preload register.
+    TIM1_CCR1 preload value is loaded in the shadow register at each UEV.
+    Note: These bits can no longer be modified while LOCK level 3 has been programmed (LOCK bits in
+    TIM1_BKR register) and CC1S = 00 (the channel is configured in output).
+    For correct operation, preload registers must be enabled when the timer is in PWM mode. This
+    is not mandatory in one-pulse mode (OPM bit set in TIM1_CR1 register). 
+
+15. TIMx_CR1
+    Bit 7 ARPE: Auto-reload preload enable.  =0 after reset
+    0: TIM1_ARR register is not buffered through a preload register. It can be written directly
+    1: TIM1_ARR register is buffered through a preload register
+
+    Bit 2 URS: Update request source. =0 after reset
+    0: When enabled by the UDIS bit, the UIF bit is set and an update interrupt request is sent when one
+    of the following events occurs:
+    – Registers are updated (counter overflow/underflow)
+    – UG bit is set by software
+    – Update event is generated through the clock/trigger controller
+    1: When enabled by the UDIS bit, the UIF bit is set and an update interrupt request is sent only when
+    registers are updated (counter overflow/underflow).
+    
+    Bit 1 UDIS: Update disable.  =0 after reset
+    0: A UEV is generated as soon as a counter overflow occurs, a software update is generated, or a
+    hardware reset is generated by the clock/trigger mode controller. Buffered registers are then loaded
+    with their preload values.
+    1: A UEV is not generated and shadow registers keep their value (ARR, PSC, CCRi). The counter
+    and the prescaler are re-initialized if the UG bit is set or if a hardware reset is received from the
+    clock/trigger mode controller.
+
+     Редактирован в SmartGit
