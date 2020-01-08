@@ -195,7 +195,7 @@ static void ButtonsTimerIsr(void)
         
         // Enable external interrupts and pullup resistors of button inputs. 
         BSP_Buttons_Init();
-        
+
         Pult_onClicks(clicksSet.asLong);
     }
 }

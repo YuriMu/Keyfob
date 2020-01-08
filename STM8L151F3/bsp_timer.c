@@ -33,19 +33,22 @@ void (*timerIsr)(void) = 0;
   */
 void BSP_Timer_Init( void )
 {
+    
     // Wake up after Intref stabilization.
     PWR_FastWakeUpCmd(DISABLE); 
     // Keep Iintref switched on in ActiveHalt mode 
     PWR_UltraLowPowerCmd(DISABLE); 
 
-    // Enable RTC clock 
-    CLK_RTCClockConfig(CLK_RTCCLKSource_LSI, CLK_RTCCLKDiv_1);
-    // Wait for LSI clock to be ready 
-    while (CLK_GetFlagStatus(CLK_FLAG_LSIRDY) == RESET);
-  
     // Connect SYSCLK to RTC 
     CLK_PeripheralClockConfig(CLK_Peripheral_RTC, ENABLE);
 
+    // Enable RTC clock 
+    CLK_RTCClockConfig(CLK_RTCCLKSource_LSI, CLK_RTCCLKDiv_1);
+    // Wait for LSI clock to be ready 
+    //while (CLK_GetFlagStatus(CLK_FLAG_LSIRDY) == RESET);
+    // Wait for RTC clock to be not busy in switch. CLK->CRTCR.RTCSWBSY
+    while (CLK_GetFlagStatus(CLK_FLAG_RTCSWBSY) == SET);
+  
     // Configures the RTC wakeup timer_step = RTCCLK/16 = LSI/16 = 421.0526 us 
     RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div16);
 
@@ -60,12 +63,14 @@ void BSP_Timer_DeInit( void )
     RTC_ITConfig(RTC_IT_WUT, DISABLE);
     RTC_ClearITPendingBit(RTC_IT_WUT);
 
+    // Disable RTC clock(usually LSI) 
+    CLK_RTCClockConfig(CLK_RTCCLKSource_Off, CLK_RTCCLKDiv_1);
+    // Wait for RTC clock to be not busy in switch. CLK->CRTCR.RTCSWBSY
+    while (CLK_GetFlagStatus(CLK_FLAG_RTCSWBSY) == SET);
+
     // Cut off SYSCLK from RTC
     CLK_PeripheralClockConfig(CLK_Peripheral_RTC, DISABLE);
     //CLK_PeripheralClockConfig(CLK_Peripheral_LCD, DISABLE);
-
-    // Disable RTC clock(usually LSI) 
-    CLK_RTCClockConfig(CLK_RTCCLKSource_Off, CLK_RTCCLKDiv_1);
 
     // Wake up before Intref stabilization. Analog features will be available in ~3ms
     PWR_FastWakeUpCmd(ENABLE); 

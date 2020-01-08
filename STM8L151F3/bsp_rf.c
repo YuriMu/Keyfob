@@ -54,6 +54,7 @@ void CC_CSN_LOW(void)
 void BSP_Rf_SPIDeInit(void)
 {
     BSP_SPI_DeInit(RF_SPI);
+    spiCurrentDevice = SPI_DEVICE_NONE;
 }
 
 uint8_t SPI_ExchangeByte(uint8_t input)
