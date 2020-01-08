@@ -24,10 +24,7 @@
   * @{
   */
 
-/* Private define and typedef ------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-
-/* Public functions ---------------------------------------------------------*/
+void (*timerIsr)(void) = 0;
       
 /**
   * @brief  Configure RTC wakeup timer peripherial 
@@ -79,7 +76,7 @@ void BSP_Timer_DeInit( void )
 // Set wakeup period (in timer steps) and launch counting
 void BSP_Timer_Arm( uint16_t aPeriod )
 {
-    RTC_WakeUpCmd(DISABLE);
+    RTC_WakeUpCmd(DISABLE); // Disable takes long time!
     RTC_SetWakeUpCounter(aPeriod);
     RTC_WakeUpCmd(ENABLE);
 }
@@ -89,6 +86,33 @@ void BSP_Timer_Arm( uint16_t aPeriod )
 void BSP_Timer_Disarm( void )
 {
     RTC_WakeUpCmd(DISABLE);        
+}
+
+// Engage RTC wakeup timer 
+uint8_t BSP_Timer_Activate(void (*isr)(void), uint16_t timeout)
+{
+    if (timerIsr == 0) {
+        // 1) Bind a specific Isr to timerIsr
+        timerIsr = isr;        
+        // 2) Configure RTC wakeup timer
+        BSP_Timer_Init();
+        // 3) Set wakeup period (in timer steps) and launch counting
+        BSP_Timer_Arm(timeout);
+        
+        return 1;
+    }    
+    return 0;
+}
+
+// Free RTC wakeup timer
+void BSP_Timer_Deactivate( void )
+{
+    // 1) Unbind a specific Isr handler from TimerIsr for use in other modules
+    timerIsr = 0;
+    // 2) Disable timer
+    BSP_Timer_Disarm();
+    // 3) Disable interrupt and deattach from clocks 
+    BSP_Timer_DeInit();        
 }
 
 

@@ -17,9 +17,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm8l15x_it.h"
-#include "pult.h"
+//#include "pult.h"
+#include "bsp_timer.h"
 #include "buttons.h"
 #include "sound.h"
+#include "rf.h"
 
 /** @addtogroup Keyfob
   * @{
@@ -98,8 +100,8 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
   */
 INTERRUPT_HANDLER(RTC_CSSLSE_IRQHandler, 4)
 {
-    if (TimerIsr) {
-        TimerIsr();
+    if (timerIsr) {
+        timerIsr();
     }
     /* Clear the periodic wakeup unit flag */
     RTC_ClearITPendingBit(RTC_IT_WUT);
@@ -196,9 +198,8 @@ INTERRUPT_HANDLER(EXTI3_IRQHandler, 11)
   */
 INTERRUPT_HANDLER(EXTI4_IRQHandler, 12)
 {
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
+    Rf_onTxRxCompleteIsr();
+    EXTI_ClearITPendingBit(EXTI_IT_Pin4);
 }
 
 
@@ -353,9 +354,8 @@ INTERRUPT_HANDLER(TIM1_CC_IRQHandler, 24)
   */
 INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler, 25)
 {
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
+    Rf_onTimerIsr();
+    TIM4_ClearITPendingBit(TIM4_IT_Update);
 }
 /**
   * @brief SPI1 Interrupt routine.

@@ -59,6 +59,9 @@ void BSP_Sound_DurationTimer_Init( void )
     // We need to generate a time base equal to ~10 ms
     // so TIM4_PERIOD = (0.01 * 488.28 - 1) = 4. Precisely 10.25 ms. Freq = 488.28/5 = 97.65 Hz
     TIM4_TimeBaseInit(TIM4_Prescaler_32768, 4);
+
+    // Disable update interrupt 
+    TIM4_ITConfig(TIM4_IT_Update, DISABLE);
   
     //------ TIM3 init ------------------------------------------------
     // Enable TIM3 clock 

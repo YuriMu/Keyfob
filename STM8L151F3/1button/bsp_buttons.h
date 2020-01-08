@@ -14,8 +14,6 @@
 #ifndef __BSP_BUTTONS_H
 #define __BSP_BUTTONS_H
 #include "stm8l15x.h"
-#include "buttons.h"
-#include "bsp_timer.h"
 
 // Buttons pins definition
 #define BUTTON_A_PORT             GPIOC
@@ -23,13 +21,11 @@
 #define BUTTON_A_EXTI             EXTI_Pin_5
 
 #define BUTTON_NUM         1    /*!< Total number of buttons. 1..4 */
-/*!< ~20.2 ms (20000/421 - 1) = ~47  */
-#define BUTTON_TIMER_PERIOD_RAW  ((uint16_t)((BUTTON_TIMER_PERIOD_MS*1000)/BSP_TIMER_RESOLUTION_US -1))
 
-extern void    BSP_Buttons_Init( void );
-extern void    BSP_Buttons_PinInterruptDisable( void );
-extern void    BSP_Buttons_EnablePullup( void );
-extern uint8_t BSP_Buttons_GetState( void );
+extern void    BSP_Buttons_Init(void);
+extern void    BSP_Buttons_PinInterruptDisable(void);
+extern void    BSP_Buttons_EnablePullup(void);
+extern uint8_t BSP_Buttons_GetState(void);
 
 #endif
 

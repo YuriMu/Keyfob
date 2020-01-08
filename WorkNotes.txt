@@ -1,0 +1,10 @@
+1. Нужно ли тактирование GPIO? для Timer Compare output ?
+2. PKTCTRL1 –PQT[2:0] bytes or bits?
+3 disable RC OSC calibration
+4. Чтобы быстрее опять засыпать после ложной преамбулы попробовать уменьшить 
+    синхрослово до 2 байт, чтобы PQI сбрасывался быстрее, ведь он 
+    после отбраковки преамбулы ждет еще время длительностью в синхрослово и только 
+    тогда падает. А после его падения  приемник засыпает
+5 for( j = 0; j < 20; j ++ ); in CC1101 driver remove?
+6.    GPIO_Init(RF_CS_PORT, RF_CS_PIN, GPIO_Mode_Out_PP_High_Fast); // CSN tbd Slow
+7. BSP_Timer_Arm(BSP_TIMER_TICKS(PULT_RF_RECV_TIMEOUT_MS)); ?

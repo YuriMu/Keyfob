@@ -1648,7 +1648,13 @@
             <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\1button\bsp_buttons.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\bsp_rf.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\bsp_sound.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\bsp_spi.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\bsp_system.c</name>
@@ -1660,16 +1666,25 @@
             <name>$PROJ_DIR$\..\..\..\..\..\buttons.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\CC1101\CC1101.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\main.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\pult.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\CC1101\rf.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\sound.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\STM8L151F3\1button\stm8l15x_it.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\utils.c</name>
         </file>
     </group>
     <group>

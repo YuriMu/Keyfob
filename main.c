@@ -22,6 +22,7 @@
 #include "bsp_buttons.h"
 #include "pult.h"
 #include "bsp_sound.h"
+#include "rf.h"
 
 
 /** @addtogroup Keyfob
@@ -46,6 +47,7 @@ void main(void)
     BSP_System_Init();
     BSP_Buttons_Init();
     BSP_Sound_Init();
+    Rf_Init();
     Pult_Init();
     //CLK_PeripheralClockConfig(CLK_Peripheral_COMP, ENABLE);
     

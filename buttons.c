@@ -18,6 +18,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "buttons.h"
 #include "bsp_buttons.h"
+#include "bsp_timer.h"
 #include "pult.h"
 
 
@@ -189,13 +190,8 @@ static void ButtonsTimerIsr(void)
             clicksSet.asByte[i] = buttons.item[i].clicksAccum & (BUTTON_NORMAL_CLICKS_MSK | BUTTON_LONG_CLICKS_MSK);
         }
         
-        // Free RTC wakeup timer, specifically: 
-        // 1) Unbind a specific Isr handler from TimerIsr for use in other modules
-        TimerIsr = 0;
-        // 2) Disable timer
-        BSP_Timer_Disarm();
-        // 3) Disable interrupt and deattach from clocks 
-        BSP_Timer_DeInit();
+        // Free RTC wakeup timer 
+        BSP_Timer_Deactivate();
         
         // Enable external interrupts and pullup resistors of button inputs. 
         BSP_Buttons_Init();
@@ -208,15 +204,8 @@ static void ButtonsTimerIsr(void)
 
 void Button_onPressIsr( void )
 {
-    if (TimerIsr == 0) {
-        // Engage RTC wakeup timer, specifically: 
-        // 1) Bind a specific Isr to TimerIsr
-        TimerIsr = ButtonsTimerIsr;        
-        // 2) Configure RTC wakeup timer
-        BSP_Timer_Init();
-        // 3) Set wakeup period (in timer steps) and launch counting
-        BSP_Timer_Arm( BUTTON_TIMER_PERIOD_RAW );
-        
+    // Engage RTC wakeup timer
+    if (BSP_Timer_Activate(ButtonsTimerIsr, BSP_TIMER_TICKS(BUTTON_TIMER_PERIOD_MS))) {
         // Disable input interrupts for all buttons 
         BSP_Buttons_PinInterruptDisable();
     }    
