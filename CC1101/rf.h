@@ -18,7 +18,8 @@
 #define RF_PREAMBLE_DURATION_MS   86
 
 #define RF_MAX_PACKET_LENGTH      60
-#define RF_DEFAULT_SELF_ADDRESS   1
+#define RF_MAX_ADDRESS            31
+#define RF_DEFAULT_SELF_ADDRESS   1  // 1..RF_MAX_ADDRESS permitted
 
 typedef enum {
     RF_STATE_POWERDOWN = 0,
@@ -30,7 +31,8 @@ typedef enum {
 extern void    Rf_Init(void);
 extern RfState Rf_GetState(void);
 extern void    Rf_Send(uint8_t* aBuffer, uint8_t aBufLength);
-extern void    Rf_Recv(uint8_t* aBuffer, uint8_t aBufSize);
+extern int8_t  Rf_Recv(uint8_t* aBuffer, uint8_t aBufSize);
+extern void    Rf_PowerDown(void);
 
 extern void Rf_onTimerIsr(void);
 extern void Rf_onTxRxCompleteIsr(void);

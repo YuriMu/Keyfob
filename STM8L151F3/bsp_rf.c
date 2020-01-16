@@ -30,7 +30,7 @@ void BSP_Rf_Init(void)
     // Don't enable interrupts so far. Will be enabled on enter in rx mode. 
     // Rising edge - sync word received. Falling edge - receive complete.
     GPIO_Init(RF_GDO0_PORT, RF_GDO0_PIN, GPIO_Mode_In_PU_No_IT);
-    EXTI_SetPinSensitivity(RF_GDO0_EXTI, EXTI_Trigger_Falling);
+    EXTI_SetPinSensitivity(RF_GDO0_EXTI, EXTI_Trigger_Falling);//EXTI_Trigger_Rising_Falling
     
     // Test pin
     GPIO_Init(RF_GDO2_PORT, RF_GDO2_PIN, GPIO_Mode_In_PU_No_IT);

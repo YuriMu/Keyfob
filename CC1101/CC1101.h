@@ -27,6 +27,7 @@
 //typedef enum { BROADCAST, ADDRESS_CHECK} TX_DATA_MODE;
 
 #define RF_DEFAULT_SYNC_WORD   0xD391
+#define RF_MAX_FREQ_OFFSET_SAMPLE  4 // For 433 MHz        =8 for 868 MHz
 
 /* Read a byte from the specified register */
 extern uint8_t CC1101ReadReg(uint8_t addr);
@@ -69,9 +70,10 @@ extern uint8_t CC1101ReadRxFifo(uint8_t* rxBuffer, uint8_t rxBufSize);
 
 /*Initialize the WOR function of CC1101*/
 extern void  CC1101WORInit(void);
+extern void  CC1101WORDeInit(void);
 
 /*Initialize the CC1101, User can modify it*/
-extern void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress);
+extern void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress, uint8_t numPreamble);
 
 #endif
 

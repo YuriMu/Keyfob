@@ -31,7 +31,7 @@
   */
 
 #define PULT_RF_SEND_TIMEOUT_MS  500
-#define PULT_RF_RECV_TIMEOUT_MS  3000
+#define PULT_RF_RECV_TIMEOUT_MS  1500
 
 #define PULT_RF_MODE_TRANSMITTER  0
 #define PULT_RF_MODE_RECEIVER     1
@@ -69,7 +69,7 @@ static void PultTimerIsr(void)
     // In Transmitter mode
     else {
         // Power down rf transceiver
-        Rf_Send(0, 0);
+        Rf_PowerDown();
     
         // Play error 
         Sound_Play(SOUNDS_LONG_BEEP, 1);
@@ -94,6 +94,7 @@ void Pult_onClicks(uint32_t aClicksSet)
     repeats = pult.clicksSet.asByte[0] & BUTTON_NORMAL_CLICKS_MSK;
     if( repeats ) {
         pult.clicksSet.asByte[0] &= ~BUTTON_NORMAL_CLICKS_MSK;
+        // Transmit packet
         if( repeats == 1 ) {
             if (BSP_Timer_Activate(PultTimerIsr, BSP_TIMER_TICKS(PULT_RF_SEND_TIMEOUT_MS))) {
                 pult.rfMode = PULT_RF_MODE_TRANSMITTER;
@@ -101,6 +102,38 @@ void Pult_onClicks(uint32_t aClicksSet)
                 // because they use the same timer TIM4.
                 Rf_Send(sendBuffer, sizeof(sendBuffer));
             }    
+        }
+        // Get RSSI
+        else if( repeats == 2 ) {
+            int8_t rssi;
+            
+            rssi = Rf_Recv(0, 0);
+            if (rssi > 50) 
+                Sound_Play(SOUNDS_LONG_BEEP, 1);
+            else if (rssi < -105)
+                Sound_Play(SOUNDS_SHORT_BEEP, 1);
+            else if (rssi < -102)
+                Sound_Play(SOUNDS_SHORT_BEEP, 2);
+            else if (rssi < -99)
+                Sound_Play(SOUNDS_SHORT_BEEP, 3);
+            else if (rssi < -96)
+                Sound_Play(SOUNDS_SHORT_BEEP, 4);
+            else if (rssi < -93)
+                Sound_Play(SOUNDS_SHORT_BEEP, 5);
+            else if (rssi < -91)
+                Sound_Play(SOUNDS_SHORT_BEEP, 6);
+            else if (rssi < -88)
+                Sound_Play(SOUNDS_SHORT_BEEP, 7);
+            else if (rssi < -85)
+                Sound_Play(SOUNDS_SHORT_BEEP, 8);
+            else
+                Sound_Play(SOUNDS_DISARMED, 1);
+        }
+        // Tramsmit infinite preamble
+        else if( repeats == 3 ) {
+            pult.rfMode = PULT_RF_MODE_TRANSMITTER;
+            Rf_Send(sendBuffer, 0);
+            Sound_Play(SOUNDS_SHORT_BEEP, 3);
         }
         else {            
             Sound_Play(SOUNDS_ARMED, repeats); //SOUNDS_SHORT_BEEP
@@ -124,7 +157,7 @@ void Pult_onClicks(uint32_t aClicksSet)
                 pult.rfMode = PULT_RF_MODE_TRANSMITTER;
                 
                 // Power down the rf transceiver
-                Rf_Send(0, 0);
+                Rf_PowerDown();
     
                 // Play success 
                 Sound_Play(SOUNDS_SHORT_BEEP, 2);
@@ -180,7 +213,7 @@ void Pult_onRfRecv(uint8_t length)
         // In Transmitter mode
         else {
             // Power down rf transceiver
-            Rf_Send(0, 0);
+            Rf_PowerDown();
     
             // Free this timer for use in other modules 
             BSP_Timer_Deactivate();

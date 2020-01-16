@@ -27,8 +27,8 @@ typedef struct {
 // Base Frequency = 432.999817 
 // CRC Autoflush = false 
 // CRC Enable = true 
-// Carrier Frequency = 433.399719 
-// Channel Number = 2 
+// Carrier Frequency = 432.999817 
+// Channel Number = 0 
 // Channel Spacing = 199.951172 
 // Data Format = Normal mode 
 // Data Rate = 9.59587 
@@ -46,7 +46,7 @@ typedef struct {
 // TX Power = 0 
 // Whitening = false 
 // PA table 
-#define PA_TABLE {0x60,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+#define PA_TABLE {0x60,0x00,0x00,0x00,0x00,0x00,0x00,0x00} //0xc0
 
 static const RfSetting rfSetting[]= 
 {
@@ -55,11 +55,11 @@ static const RfSetting rfSetting[]=
     {CC1101_PKTCTRL1,    0x06},
     {CC1101_PKTCTRL0,    0x05},
     {CC1101_ADDR,        0x01},
-    {CC1101_CHANNR,      0x02},
+    {CC1101_CHANNR,      0x00},
     {CC1101_FREQ2,       0x10},
     {CC1101_FREQ1,       0xA7},
     {CC1101_FREQ0,       0x62},
-    {CC1101_MDMCFG4,     0x88},
+    {CC1101_MDMCFG4,     0x88},// 0x28
     {CC1101_MDMCFG3,     0x83},
     {CC1101_MDMCFG2,     0x13},
     {CC1101_DEVIATN,     0x34},
@@ -70,8 +70,82 @@ static const RfSetting rfSetting[]=
     {CC1101_TEST2,       0x81},
     {CC1101_TEST1,       0x35},
     {CC1101_TEST0,       0x09},
+    {CC1101_FSCTRL1,     0x06},
+                   //{CC1101_FOCCFG,      0x16},
+                   //{CC1101_AGCCTRL2, 0xC7}, //  AGC control. reset value=  03
+    //{CC1101_AGCCTRL1, 0x4b}, //  AGC control. reset value= 40   4b - decrese CS abs  threshold
+                   //{CC1101_AGCCTRL0, 0xB0}, //  AGC control. 91
 };
 
+
+// Chipcon
+// Product = CC1101
+// Chip version = A   (VERSION = 0x04)
+// Crystal accuracy = 10 ppm
+// X-tal frequency = 26 MHz
+// RF output power = 0 dBm
+// RX filterbandwidth = 200 kHz //541.666667 kHz
+// Deviation = 19 kHz //127 kHz
+// Datarate = 9.6 kBaud //249.938965 kBaud
+// Modulation = (1) GFSK
+// Manchester enable = (0) Manchester disabled
+// RF Frequency = 432.999817 MHz
+// Channel spacing = 199.951172 kHz
+// Channel number = 0
+// Optimization = Sensitivity
+// Sync mode = (3) 30/32 sync word bits detected
+// Format of RX/TX data = (0) Normal mode, use FIFOs for RX and TX
+// CRC operation = (1) CRC calculation in TX and CRC check in RX enabled
+// Forward Error Correction = (0) FEC disabled
+// Length configuration = (1) Variable length packets, packet length configured by the first received byte after sync word.
+// Packetlength = 255
+// Preamble count = (2)  4 bytes
+// Append status = 1
+// Address check = 10b address check and broadcast addr = 0 //(0) No address check
+// FIFO autoflush = 0
+// Device address = 1 //0
+// GDO0 signal selection = ( 6) Asserts when sync word has been sent / received, and de-asserts at the end of the packet
+// GDO2 signal selection = (41) CHIP_RDY
+/*
+static const RfSetting rfSetting[]= 
+{
+    {CC1101_FSCTRL1 , 0x0C}, //  Frequency synthesizer control.
+    {CC1101_FSCTRL0 , 0x00}, //  Frequency synthesizer control.
+    {CC1101_FREQ2   , 0x10}, //  Frequency control word, high byte.
+    {CC1101_FREQ1   , 0xA7}, //  Frequency control word, middle byte.
+    {CC1101_FREQ0   , 0x62}, //  Frequency control word, low byte.
+    {CC1101_MDMCFG4 , 0x88}, // was 28 was 2d Modem configuration.
+    {CC1101_MDMCFG3 , 0x83}, // was 3b Modem configuration.
+    {CC1101_MDMCFG2 , 0x13}, //  Modem configuration.
+    {CC1101_MDMCFG1 , 0x22}, //  Modem configuration.
+    {CC1101_MDMCFG0 , 0xF8}, //  Modem configuration.
+    {CC1101_CHANNR  , 0x00}, //  Channel number.
+    {CC1101_DEVIATN , 0x34}, //  was 62 Modem deviation setting (when FSK modulation is enabled).
+    {CC1101_FREND1  , 0xB6}, //  Front end RX configuration.
+    {CC1101_FREND0  , 0x10}, //  Front end TX configuration.
+    {CC1101_MCSM0   , 0x18}, //  Main Radio Control State Machine configuration.
+    {CC1101_FOCCFG  , 0x1D}, //  Frequency Offset Compensation Configuration. Reset value = 36
+    {CC1101_BSCFG   , 0x1C}, //  Bit synchronization Configuration.
+    {CC1101_AGCCTRL2, 0xC7}, //  AGC control. reset value=  03
+    {CC1101_AGCCTRL1, 0x00}, //  AGC control. reset value= 40   4b - decrese CS abs  threshold
+    {CC1101_AGCCTRL0, 0xB0}, //  AGC control. 91
+    {CC1101_FSCAL3  , 0xE9}, //  was ea Frequency synthesizer calibration.
+    {CC1101_FSCAL2  , 0x2A}, //  Frequency synthesizer calibration.
+    {CC1101_FSCAL1  , 0x00}, //  Frequency synthesizer calibration.
+    {CC1101_FSCAL0  , 0x1F}, //  Frequency synthesizer calibration.
+    {CC1101_FSTEST  , 0x59}, //  Frequency synthesizer calibration.
+    {CC1101_TEST2   , 0x81}, //  was 88 Various test settings.
+    {CC1101_TEST1   , 0x35}, //  was 31 Various test settings.
+    {CC1101_TEST0   , 0x09}, //  Various test settings.
+    {CC1101_FIFOTHR , 0x47}, //  was 07 RXFIFO and TXFIFO thresholds.
+    {CC1101_IOCFG2  , 0x29}, //  GDO2 output pin configuration.
+    {CC1101_IOCFG0  , 0x06}, //  GDO0 output pin configuration. 
+    {CC1101_PKTCTRL1, 0x06}, // was 04 Packet automation control.
+    {CC1101_PKTCTRL0, 0x05}, //  Packet automation control.
+    {CC1101_ADDR    , 0x01}, //  was 00 Device address.
+    {CC1101_PKTLEN  , 0xFF}  //  Packet length.
+};                            
+*/
 static const uint8_t paTable[] = PA_TABLE;
 
 /*
@@ -406,7 +480,7 @@ void  CC1101WORInit(void)
     //[3:2]=10,Timeout after XOSC start = Approx. 149 – 155 us 
     //[1]=0,Disables the pin radio control option 
     //[0]=0,Force the XOSC to stay on in the SLEEP state =  Disable
-    CC1101WriteReg(CC1101_MCSM0,0x38);
+    CC1101WriteReg(CC1101_MCSM0,0x38); // 18 was 38
 
     // Wake On Radio Control 
     //[7]=0,Power down signal to RC oscillator.When written to 0,automatic initial calibration will be performed. 
@@ -414,14 +488,14 @@ void  CC1101WORInit(void)
     //[3]=1,Enables the RC oscillator calibration. 
     //[1:0]=00,WOR_RES =00,Controls the Event 0 resolution as well as maximum timeout of the WOR module 
     //and maximum timeout under normal RX operation: 
-    CC1101WriteReg(CC1101_WORCTRL,0x78); 
+    CC1101WriteReg(CC1101_WORCTRL,0x78);  //78  0x38 
     
     //// Degrade sensitivity by increase of the RSSI threshold 
     //CC1101WriteReg(CC1101_AGCCTRL1, CC1101ReadReg(CC1101_AGCCTRL1) | 0x07);
     
     // Set preamble quality threshould (PQT) =1(bytes?)
     // In the register was: append status = 1, address check mode = 10b - native and 0 broad addr check
-    CC1101WriteReg(CC1101_PKTCTRL1, CC1101ReadReg(CC1101_PKTCTRL1) | 0x20); 
+    CC1101WriteReg(CC1101_PKTCTRL1, CC1101ReadReg(CC1101_PKTCTRL1) | 0x60); // was 20
 
     //Main Radio Control State Machine Configuration 
     //[4]=1,Direct RX termination, based on RSSI measurement, enabled
@@ -430,15 +504,16 @@ void  CC1101WORInit(void)
     //[2:0]=011,Timeout for sync word search in RX for both WOR mode and normal RX 
     //operation. The timeout is relative to the programmed EVENT0 timeout.  
     //RX timeout (when WOR_RES = 0) = 1.563% * 75ms = 1.17ms 
-    CC1101WriteReg(CC1101_MCSM2,0x1b);
+    CC1101WriteReg(CC1101_MCSM2,0x1a);  //was 1b
 
     //EVENT0 timeout = 75ms, Event0 = 26000000Hz * 0.075s/750 = 2600    
     CC1101WriteReg(CC1101_WOREVT1,0x0a); // High Byte Event0
     CC1101WriteReg(CC1101_WOREVT0,0x28); // Low Byte Event0 
 
     //Reset real time clock to Event1 value. 
-    CC1101WriteCmd( CC1101_SWORRST );
+    //CC1101WriteCmd( CC1101_SWORRST );
 }
+
 
 /*
 ================================================================================
@@ -455,7 +530,7 @@ static void CC1101Reset( void )
     CC_CSN_HIGH( );
     CC_CSN_LOW( );
     CC_CSN_HIGH( );
-    for( x = 0; x < 100; x ++ );        // 40us
+    for( x = 0; x < 250; x ++ );        // 100 40us
     CC1101WriteCmd(CC1101_SRES);
 }
 
@@ -467,7 +542,7 @@ INPUT    : None
 OUTPUT   : None
 ================================================================================
 */
-void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress)
+void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress, uint8_t numPreamble)
 {
     uint8_t i;
     
@@ -480,9 +555,15 @@ void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress)
         CC1101WriteReg(rfSetting[i].registerAddress, rfSetting[i].registerValue);
     }
  
-    //for(i = 0; i < 23; i++) {
-    //    j = CC1101ReadReg(CC1101InitData[i][0]);
+    //for(i = 0; i < 0x2f; i++) {
+    //    j = CC1101ReadReg(i);
     //    printf("%d  ", (int)j);
+    //}
+    
+    //static uint8_t regArray[0x2f];
+    //for(i = 0; i < 0x2f; i++) {
+    //    regArray[i] = CC1101ReadReg(i);
+    //    regArray[i] = regArray[i];
     //}
     
     //CC1101SetAddress(TX_Address, BROAD_0AND255);  // ´Ó»úµØÖ·
@@ -494,6 +575,12 @@ void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress)
     
     CC1101SetSYNC(RF_DEFAULT_SYNC_WORD);           // 8799
     
+    // Set preamble length
+    i = CC1101ReadReg(CC1101_MDMCFG1);
+    i &= ~0x70;
+    i |= (numPreamble << 4);
+    CC1101WriteReg(CC1101_MDMCFG1, i); //0x42; was default 0x22 8 bytes preamble
+    
     //CC1101WriteReg(CC1101_MDMCFG1, 0x22); // Modem Configuration: chan spacing = 200 kHz,      
     //CC1101WriteReg(CC1101_MDMCFG0, 0xF8); // num preamble=4 bytes, FEC disable      
 
@@ -501,15 +588,67 @@ void CC1101Init(uint8_t maxPacketLength, uint8_t selfAddress)
     
     // Init wake on radio receive mode
     CC1101WORInit();
+    //CC1101WriteReg(CC1101_MCSM0,0x38);
+    ////CC1101WriteReg(CC1101_MCSM2,0x07);
+   //CC1101WriteReg(CC1101_PKTCTRL1, CC1101ReadReg(CC1101_PKTCTRL1) | 0x60); //3 bytes or bits? PQT threshold 
+    //CC1101WriteReg(CC1101_IOCFG0,0x08); // Interrupt on PQT threshold reached
+    //CC1101WriteReg(CC1101_IOCFG2,0x24); // Interrupt on WOR EVENT0
+    //CC1101WriteReg(CC1101_IOCFG2,0x26); // Interrupt on WOR EVENT1
     
-    i = CC1101ReadStatus(CC1101_PARTNUM);//for test, must be 0x80
-    i = CC1101ReadStatus(CC1101_VERSION);//for test, VERSION = 0x04
+    
+    i = CC1101ReadStatus(CC1101_PARTNUM);//for test, must be 0x80 00?
+    i = CC1101ReadStatus(CC1101_VERSION);//for test, VERSION = 0x14
 
     // Set power down state
     CC1101WriteCmd(CC1101_SPWD);
-//    CC1101SetTRMode(TX_MODE);                      // ·¢ËÍÄ£Ê½ 
-//    printf("Mode:TX\r\n");
 }
+
+
+
+
+
+
+void  CC1101WORDeInit(void)
+{
+    // Main Radio Control State Machine Configuration 
+    //[5:4]=01,When to perform automatic calibration = Every time When going from IDLE to RX or TX
+    //[3:2]=10,Timeout after XOSC start = Approx. 149 – 155 us 
+    //[1]=0,Disables the pin radio control option 
+    //[0]=0,Force the XOSC to stay on in the SLEEP state =  Disable
+    CC1101WriteReg(CC1101_MCSM0,0x18); 
+
+    // Wake On Radio Control 
+    //[7]=1,Power down signal to RC oscillator.When written to 0,automatic initial calibration will be performed. 
+    //[6:4]=111,Event 1 timeout = (1.333 – 1.385 ms) ,clock periods after Event 0 before Event 1 times out. 
+    //[3]=1,Enables the RC oscillator calibration. 
+    //[1:0]=11,WOR_RES =11,Controls the Event 0 resolution as well as maximum timeout of the WOR module 
+    //and maximum timeout under normal RX operation: 
+    CC1101WriteReg(CC1101_WORCTRL,0xfb);  
+    
+    //// Degrade sensitivity by increase of the RSSI threshold 
+    //CC1101WriteReg(CC1101_AGCCTRL1, CC1101ReadReg(CC1101_AGCCTRL1) | 0x07);
+    
+    // Disable preamble quality threshould (PQT).
+    // In the register was: append status = 1, address check mode = 10b - native and 0 broad addr check
+    CC1101WriteReg(CC1101_PKTCTRL1, CC1101ReadReg(CC1101_PKTCTRL1) & ~0xe0); 
+
+    //Main Radio Control State Machine Configuration 
+    //[4]=0,Direct RX termination, based on RSSI measurement, enabled
+    //[3]=0,When the RX_TIME timer expires, the chip checks if sync word is
+    //      found  or PQI is set  when RX_TIME_QUAL=1;
+    //[2:0]=111,Timeout for sync word search in RX for both WOR mode and normal RX 
+    //operation. The timeout is disabled.  
+    //RX timeout (when WOR_RES = 0) = 1.563% * 75ms = 1.17ms 
+    CC1101WriteReg(CC1101_MCSM2,0x08); 
+
+    //EVENT0 timeout = 75ms, Event0 = 26000000Hz * 0.075s/750 = 2600    
+    //CC1101WriteReg(CC1101_WOREVT1,0x0a); // High Byte Event0
+    //CC1101WriteReg(CC1101_WOREVT0,0x28); // Low Byte Event0 
+
+    //Reset real time clock to Event1 value. 
+    //CC1101WriteCmd( CC1101_SWORRST );
+}
+
 /*
 ================================================================================
 ------------------------------------THE END-------------------------------------
